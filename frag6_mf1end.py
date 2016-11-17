@@ -1,10 +1,10 @@
 #!/usr/local/bin/python2.7
 
-print "ping6 fragments with an atomic fragment with mf=0 overlapping"
+print "ping6 fragment with mf=1 that overlaps the last fragment at the end"
 
-# |---------|
-# |XXXX|
-#           |----|
+#      |---------|
+#           |XXXX|
+# |----|
 
 import os
 from addr import *
@@ -14,9 +14,9 @@ pid=os.getpid() & 0xffff
 payload="ABCDEFGHIJKLMNOP"
 packet=IPv6(src=SRC_OUT6, dst=DST_IN6)/ICMPv6EchoRequest(id=pid, data=payload)
 frag=[]
-frag.append(IPv6ExtHdrFragment(nh=58, id=pid, m=1)/str(packet)[40:56])
-frag.append(IPv6ExtHdrFragment(nh=58, id=pid)/str(packet)[40:48])
-frag.append(IPv6ExtHdrFragment(nh=58, id=pid, offset=2)/str(packet)[56:64])
+frag.append(IPv6ExtHdrFragment(nh=58, id=pid, offset=1)/str(packet)[48:64])
+frag.append(IPv6ExtHdrFragment(nh=58, id=pid, m=1, offset=2)/str(packet)[56:64])
+frag.append(IPv6ExtHdrFragment(nh=58, id=pid, m=1)/str(packet)[40:48])
 eth=[]
 for f in frag:
 	pkt=IPv6(src=SRC_OUT6, dst=DST_IN6)/f
@@ -41,8 +41,9 @@ for a in ans:
 		data=a.payload.payload.data
 		print "payload=%s" % (data)
 		if data == payload:
-			exit(0)
+			print "ECHO REPLY"
+			exit(1)
 		print "PAYLOAD!=%s" % (payload)
 		exit(2)
-print "NO ECHO REPLY"
-exit(1)
+print "no echo reply"
+exit(0)
