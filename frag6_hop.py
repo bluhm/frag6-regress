@@ -1,6 +1,9 @@
 #!/usr/local/bin/python2.7
 # send 2 ping6 fragments with missplaced hop-by-hop extension header
 
+# |HHHH----------|
+#                |----|
+
 import os
 from addr import *
 from scapy.all import *
