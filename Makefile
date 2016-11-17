@@ -103,6 +103,13 @@ run-regress-frag6-ext: addr.py
 	@echo Check ping6 extension header reassembly
 	${SUDO} ${PYTHON}frag6_ext.py
 
+# An hop by hop options extension header after the fragment header
+TARGETS +=	frag6-hop
+run-regress-frag6-hop: addr.py
+	@echo '\n======== $@ ========'
+	@echo Check ping6 not initial hop by hop extension header
+	${SUDO} ${PYTHON}frag6_hop.py
+
 # An destination options extension header after the fragment header
 TARGETS +=	frag6-opt
 run-regress-frag6-opt: addr.py
