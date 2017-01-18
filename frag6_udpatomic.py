@@ -16,7 +16,8 @@ if sport < 1024 or sport == 2049:
 payload="ABCDEFGHIJKLMNOP"
 packet=IPv6(src=SRC_OUT6, dst=DST_IN6)/UDP(sport=sport, dport=7)/payload
 frag=[]
-frag.append(IPv6ExtHdrFragment(nh=17, id=pid)/str(packet)[40:64])
+fid=pid & 0xffffffff
+frag.append(IPv6ExtHdrFragment(nh=17, id=fid)/str(packet)[40:64])
 eth=[]
 for f in frag:
 	pkt=IPv6(src=SRC_OUT6, dst=DST_IN6)/f
