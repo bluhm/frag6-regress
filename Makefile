@@ -9,12 +9,13 @@
 .if ! (make(clean) || make(cleandir) || make(obj))
 # Check wether all required python packages are installed.  If some
 # are missing print a warning and skip the tests, but do not fail.
-PYTHON_IMPORT != python2.7 -c 'from scapy.all import *' 2>&1 || true
+PYTHON_IMPORT !!= python2.7 -c 'from scapy.all import *' 2>&1 || true
 .endif
+
 .if ! empty(PYTHON_IMPORT)
 regress:
 	@echo '${PYTHON_IMPORT}'
-	@echo install python and the scapy module for additional tests
+	@echo Install python and the scapy module for additional tests.
 	@echo SKIPPED
 .endif
 
@@ -42,9 +43,9 @@ DST_IN6 ?=
 .if empty (SRC_IF) || empty (SRC_MAC) || empty (DST_MAC) || \
     empty (SRC_OUT6) || empty (DST_IN6)
 regress:
-	@echo this tests needs a remote machine to operate on
-	@echo SRC_IF SRC_MAC DST_MAC SRC_OUT6 DST_IN6 are empty
-	@echo fill out these variables for additional tests
+	@echo This tests needs a remote machine to operate on.
+	@echo SRC_IF SRC_MAC DST_MAC SRC_OUT6 DST_IN6 are empty.
+	@echo Fill out these variables for additional tests.
 	@echo SKIPPED
 .endif
 
