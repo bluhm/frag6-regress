@@ -20,31 +20,27 @@ regress:
 .endif
 
 # This test needs a manual setup of two machines
-# Set up machines: SRC DST
-# SRC is the machine where this makefile is running.
-# DST is running OpenBSD with pf disabled to test the IPv6 stack.
-# Enable echo udp6 in inetd.conf of DST to test UDP fragments.
-#
-# +---+   1   +---+
-# |SRC| ----> |DST|
-# +---+       +---+
-#     out    in
+# Set up machines: LOCAL REMOTE
+# LOCAL is the machine where this makefile is running.
+# REMOTE is running OpenBSD with or without pf to test fragment reassemly
+# Enable echo udp6 in inetd.conf on REMOTE to test UDP fragments.
+# REMOTE_SSH is used to login and enable or disable pf automatically.
 
 # Configure Addresses on the machines.
 # Adapt interface and addresse variables to your local setup.
 #
-SRC_IF ?=
-SRC_MAC ?=
-DST_MAC ?=
+LOCAL_IF ?=
+LOCAL_MAC ?=
+REMOTE_MAC ?=
 
-SRC_OUT6 ?=
-DST_IN6 ?=
+LOCAL_ADDR ?=
+REMOTE_ADDR ?=
 
 .if empty (SRC_IF) || empty (SRC_MAC) || empty (DST_MAC) || \
     empty (SRC_OUT6) || empty (DST_IN6) || empty (REMOTE_SSH)
 regress:
 	@echo This tests needs a remote machine to operate on.
-	@echo SRC_IF SRC_MAC DST_MAC SRC_OUT6 DST_IN6 REMOTE_SSH are empty.
+	@echo SRC_IF SRC_MAC DST_MAC SRC_OUT6 DST_IN6 REMOTE_SSH
 	@echo Fill out these variables for additional tests.
 	@echo SKIPPED
 .endif
