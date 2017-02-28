@@ -26,15 +26,17 @@ regress:
 # Enable echo udp6 in inetd.conf on REMOTE to test UDP fragments.
 # REMOTE_SSH is used to login and enable or disable pf automatically.
 
-# Configure Addresses on the machines.
+# Configure addresses on the machines.
 # Adapt interface and addresse variables to your local setup.
-#
+
 LOCAL_IF ?=
 LOCAL_MAC ?=
 REMOTE_MAC ?=
 
 LOCAL_ADDR ?=
 REMOTE_ADDR ?=
+
+REMOTE_SSH ?=
 
 .if empty (LOCAL_IF) || empty (LOCAL_MAC) || empty (REMOTE_MAC) || \
     empty (LOCAL_ADDR6) || empty (REMOTE_ADDR6) || empty (REMOTE_SSH)
@@ -131,5 +133,30 @@ REGRESS_TARGETS +=	run-regress-${sp}-ping6 run-regress-${sp}-fragping6 \
 REGRESS_TARGETS +=	stamp-pf
 
 CLEANFILES +=		addr.py *.pyc *.log stamp-*
+
+.PHONY: check-setup check-setup-local check-setup-remote
+
+# Check wether the address, route and remote setup is correct
+check-setup: check-setup-local check-setup-remote
+
+check-setup-local:
+	@echo '\n======== $@ ========'
+	ping -n -c 1 ${LOCAL_ADDR}  # LOCAL_ADDR
+	route -n get -inet6 ${LOCAL_ADDR6} |\
+	    grep -q 'flags: .*LOCAL'  # LOCAL_ADDR6
+	ping6 -n -c 1 ${REMOTE_ADDR6}  # REMOTE_ADDR6
+	route -n get -inet6 ${REMOTE_ADDR6} |\
+	    grep -q 'interface: ${LOCAL_IF}$$'  # REMOTE_ADDR6 LOCAL_IF
+	ndp -n ${REMOTE_ADDR6} |\
+	    grep -q ' ${REMOTE_MAC} '  # REMOTE_ADDR6 REMOTE_MAC
+
+check-setup-remote:
+	@echo '\n======== $@ ========'
+	ssh ${REMOTE_SSH} ping -n -c 1 ${REMOTE_ADDR}  # REMOTE_ADDR
+	ssh ${REMOTE_SSH} route -n get -inet6 ${REMOTE_ADDR6} |\
+	    grep -q 'flags: .*LOCAL'  # REMOTE_ADDR6
+	ssh ${REMOTE_SSH} ping6 -n -c 1 ${LOCAL_ADDR6}  # LOCAL_ADDR6
+	ssh ${REMOTE_SSH} ndp -n ${LOCAL_ADDR6} |\
+	    grep -q ' ${LOCAL_MAC} '  # LOCAL_ADDR6 LOCAL_MAC
 
 .include <bsd.regress.mk>
