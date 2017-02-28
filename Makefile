@@ -13,6 +13,8 @@ PYTHON_IMPORT !!= python2.7 -c 'from scapy.all import *' 2>&1 || true
 .endif
 
 .if ! empty(PYTHON_IMPORT)
+.BEGIN:
+	@true
 regress:
 	@echo '${PYTHON_IMPORT}'
 	@echo Install python and the scapy module for additional tests.
@@ -40,6 +42,8 @@ REMOTE_SSH ?=
 
 .if empty (LOCAL_IF) || empty (LOCAL_MAC) || empty (REMOTE_MAC) || \
     empty (LOCAL_ADDR6) || empty (REMOTE_ADDR6) || empty (REMOTE_SSH)
+.BEGIN:
+	@true
 regress:
 	@echo This tests needs a remote machine to operate on.
 	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC LOCAL_ADDR6 REMOTE_ADDR6 REMOTE_SSH
