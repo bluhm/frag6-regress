@@ -13,7 +13,8 @@ from scapy.all import *
 pid=os.getpid()
 eid=pid & 0xffff
 payload="ABCDEFGHIJKLMNOP"
-packet=IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/ICMPv6EchoRequest(id=eid, data=payload)
+packet=IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/ \
+    ICMPv6EchoRequest(id=eid, data=payload)
 frag=[]
 fid=pid & 0xffffffff
 frag.append(IPv6ExtHdrFragment(nh=58, id=fid, offset=1)/str(packet)[48:64])

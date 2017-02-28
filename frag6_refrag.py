@@ -15,7 +15,8 @@ from scapy.all import *
 pid=os.getpid()
 eid=pid & 0xffff
 payload=100 * "ABCDEFGHIJKLMNOP"
-packet=IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/ICMPv6EchoRequest(id=eid, data=payload)
+packet=IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/ \
+    ICMPv6EchoRequest(id=eid, data=payload)
 request_cksum=ICMPv6Unknown(str(packet.payload)).cksum
 print "request cksum=%#x" % (request_cksum)
 frag=[]

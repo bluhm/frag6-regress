@@ -15,7 +15,8 @@ uport=pid & 0xffff
 if uport < 1024 or uport == 2049:
 	uport+=1024
 payload="ABCDEFGHIJKLMNOP"
-packet=IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/UDP(sport=uport, dport=7)/payload
+packet=IPv6(src=LOCAL_ADDR6, dst=REMOTE_ADDR6)/ \
+    UDP(sport=uport, dport=7)/payload
 frag=[]
 fid=pid & 0xffffffff
 frag.append(IPv6ExtHdrFragment(nh=17, id=fid, m=1)/str(packet)[40:48])
