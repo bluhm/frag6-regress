@@ -36,11 +36,11 @@ REMOTE_MAC ?=
 LOCAL_ADDR ?=
 REMOTE_ADDR ?=
 
-.if empty (SRC_IF) || empty (SRC_MAC) || empty (DST_MAC) || \
-    empty (SRC_OUT6) || empty (DST_IN6) || empty (REMOTE_SSH)
+.if empty (LOCAL_IF) || empty (LOCAL_MAC) || empty (REMOTE_MAC) || \
+    empty (LOCAL_ADDR6) || empty (REMOTE_ADDR6) || empty (REMOTE_SSH)
 regress:
 	@echo This tests needs a remote machine to operate on.
-	@echo SRC_IF SRC_MAC DST_MAC SRC_OUT6 DST_IN6 REMOTE_SSH
+	@echo LOCAL_IF LOCAL_MAC REMOTE_MAC LOCAL_ADDR6 REMOTE_ADDR6 REMOTE_SSH
 	@echo Fill out these variables for additional tests.
 	@echo SKIPPED
 .endif
@@ -59,10 +59,10 @@ depend: addr.py
 # Create python include file containing the addresses.
 addr.py: Makefile
 	rm -f $@ $@.tmp
-	echo 'SRC_IF = "${SRC_IF}"' >>$@.tmp
-	echo 'SRC_MAC = "${SRC_MAC}"' >>$@.tmp
-	echo 'DST_MAC = "${DST_MAC}"' >>$@.tmp
-.for var in SRC_OUT DST_IN
+	echo 'LOCAL_IF = "${LOCAL_IF}"' >>$@.tmp
+	echo 'LOCAL_MAC = "${LOCAL_MAC}"' >>$@.tmp
+	echo 'REMOTE_MAC = "${REMOTE_MAC}"' >>$@.tmp
+.for var in LOCAL_ADDR REMOTE_ADDR
 	echo '${var}6 = "${${var}6}"' >>$@.tmp
 .endfor
 	mv $@.tmp $@
@@ -99,17 +99,17 @@ FRAG6_SCRIPTS !!=	cd ${.CURDIR} && ls -1 frag6*.py
 ${sp}: run-regress-${sp}-ping6
 run-regress-${sp}-ping6: stamp-${sp}
 	@echo '\n======== $@ ========'
-.for ip in SRC_OUT DST_IN
+.for ip in LOCAL_ADDR REMOTE_ADDR
 	@echo Check ping6 ${ip}6:
 	ping6 -n -c 1 ${${ip}6}
 .endfor
 
 # Ping all addresses again but with 5000 bytes payload.  These large
-# packets get fragmented by SRC and must be handled by DST.
+# packets get fragmented by LOCAL and must be handled by REMOTE.
 ${sp}: run-regress-${sp}-fragping6
 run-regress-${sp}-fragping6: stamp-${sp}
 	@echo '\n======== $@ ========'
-.for ip in SRC_OUT DST_IN
+.for ip in LOCAL_ADDR REMOTE_ADDR
 	@echo Check ping6 ${ip}6:
 	ping6 -n -c 1 -s 5000 -m ${${ip}6}
 .endfor
