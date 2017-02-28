@@ -49,6 +49,15 @@ regress:
 	@echo SKIPPED
 .endif
 
+.MAIN: all
+
+.if make (regress) || make (all)
+.BEGIN: addr.py
+	@echo
+	${SUDO} true
+	rm -f stamp-stack stamp-pf
+.endif
+
 depend: addr.py
 
 # Create python include file containing the addresses.
@@ -72,11 +81,26 @@ PYTHON =	PYTHONPATH=${.OBJDIR} python2.7 ${.CURDIR}/
 
 FRAG6_SCRIPTS !!=	cd ${.CURDIR} && ls -1 frag6*.py
 
-.for ps in pf stack
+stamp-stack:
+	rm -f stamp-stack stamp-pf
+	-ssh -t ${REMOTE_SSH} ${SUDO} pfctl -d
+	ssh -t ${REMOTE_SSH} ${SUDO} pfctl -a regress -Fr
+	date >$@
+
+stamp-pf:
+	rm -f stamp-stack stamp-pf
+	echo 'pass proto tcp from port ssh no state\n'\
+	    'pass proto tcp to port ssh no state'|\
+	    ssh -t ${REMOTE_SSH} ${SUDO} pfctl -a regress -f -
+	-ssh -t ${REMOTE_SSH} ${SUDO} pfctl -e
+	date >$@
+
+.for sp in stack pf
 
 # Ping all addresses.  This ensures that the ip addresses are configured
 # and all routing table are set up to allow bidirectional packet flow.
-run-regress-${ps}-ping6:
+${sp}: run-regress-${sp}-ping6
+run-regress-${sp}-ping6: stamp-${sp}
 	@echo '\n======== $@ ========'
 .for ip in SRC_OUT DST_IN
 	@echo Check ping6 ${ip}6:
@@ -85,7 +109,8 @@ run-regress-${ps}-ping6:
 
 # Ping all addresses again but with 5000 bytes payload.  These large
 # packets get fragmented by SRC and must be handled by DST.
-run-regress-${ps}-fragping6:
+${sp}: run-regress-${sp}-fragping6
+run-regress-${sp}-fragping6: stamp-${sp}
 	@echo '\n======== $@ ========'
 .for ip in SRC_OUT DST_IN
 	@echo Check ping6 ${ip}6:
@@ -93,16 +118,17 @@ run-regress-${ps}-fragping6:
 .endfor
 
 .for s in ${FRAG6_SCRIPTS}
-run-regress-${ps}-${s}: addr.py
+${sp}: run-regress-${sp}-${s}
+run-regress-${sp}-${s}: addr.py stamp-${sp}
 	@echo '\n======== $@ ========'
 	${SUDO} ${PYTHON}${s}
 .endfor
 
-REGRESS_TARGETS =	run-regress-${ps}-ping6 run-regress-${ps}-fragping6 \
-			${FRAG6_SCRIPTS:S/^/run-regress-${ps}-/}
+REGRESS_TARGETS +=	run-regress-${sp}-ping6 run-regress-${sp}-fragping6 \
+			${FRAG6_SCRIPTS:S/^/run-regress-${sp}-/}
 
 .endfor
 
-CLEANFILES +=		addr.py *.pyc *.log
+CLEANFILES +=		addr.py *.pyc *.log stamp-*
 
 .include <bsd.regress.mk>
