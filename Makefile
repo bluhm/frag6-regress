@@ -41,10 +41,10 @@ SRC_OUT6 ?=
 DST_IN6 ?=
 
 .if empty (SRC_IF) || empty (SRC_MAC) || empty (DST_MAC) || \
-    empty (SRC_OUT6) || empty (DST_IN6)
+    empty (SRC_OUT6) || empty (DST_IN6) || empty (REMOTE_SSH)
 regress:
 	@echo This tests needs a remote machine to operate on.
-	@echo SRC_IF SRC_MAC DST_MAC SRC_OUT6 DST_IN6 are empty.
+	@echo SRC_IF SRC_MAC DST_MAC SRC_OUT6 DST_IN6 REMOTE_SSH are empty.
 	@echo Fill out these variables for additional tests.
 	@echo SKIPPED
 .endif
