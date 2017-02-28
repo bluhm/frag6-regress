@@ -79,8 +79,6 @@ PYTHON =	python2.7 ./
 PYTHON =	PYTHONPATH=${.OBJDIR} python2.7 ${.CURDIR}/
 .endif
 
-FRAG6_SCRIPTS !!=	cd ${.CURDIR} && ls -1 frag6*.py
-
 stamp-stack:
 	rm -f stamp-stack stamp-pf
 	-ssh -t ${REMOTE_SSH} ${SUDO} pfctl -d
@@ -94,6 +92,9 @@ stamp-pf:
 	    ssh -t ${REMOTE_SSH} ${SUDO} pfctl -a regress -f -
 	-ssh -t ${REMOTE_SSH} ${SUDO} pfctl -e
 	date >$@
+
+REGRESS_TARGETS =
+FRAG6_SCRIPTS !!=	cd ${.CURDIR} && ls -1 frag6*.py
 
 .for sp in stack pf
 
@@ -128,6 +129,10 @@ REGRESS_TARGETS +=	run-regress-${sp}-ping6 run-regress-${sp}-fragping6 \
 			${FRAG6_SCRIPTS:S/^/run-regress-${sp}-/}
 
 .endfor
+
+# After running the tests, turn on pf on remote machine.
+# This is the expected default configuration.
+REGRESS_TARGETS +=	stamp-pf
 
 CLEANFILES +=		addr.py *.pyc *.log stamp-*
 
