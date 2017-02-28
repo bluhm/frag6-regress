@@ -141,7 +141,7 @@ check-setup: check-setup-local check-setup-remote
 
 check-setup-local:
 	@echo '\n======== $@ ========'
-	ping -n -c 1 ${LOCAL_ADDR}  # LOCAL_ADDR
+	ping6 -n -c 1 ${LOCAL_ADDR6}  # LOCAL_ADDR6
 	route -n get -inet6 ${LOCAL_ADDR6} |\
 	    grep -q 'flags: .*LOCAL'  # LOCAL_ADDR6
 	ping6 -n -c 1 ${REMOTE_ADDR6}  # REMOTE_ADDR6
@@ -152,7 +152,7 @@ check-setup-local:
 
 check-setup-remote:
 	@echo '\n======== $@ ========'
-	ssh ${REMOTE_SSH} ping -n -c 1 ${REMOTE_ADDR}  # REMOTE_ADDR
+	ssh ${REMOTE_SSH} ping6 -n -c 1 ${REMOTE_ADDR6}  # REMOTE_ADDR6
 	ssh ${REMOTE_SSH} route -n get -inet6 ${REMOTE_ADDR6} |\
 	    grep -q 'flags: .*LOCAL'  # REMOTE_ADDR6
 	ssh ${REMOTE_SSH} ping6 -n -c 1 ${LOCAL_ADDR6}  # LOCAL_ADDR6
