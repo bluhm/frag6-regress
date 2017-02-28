@@ -70,9 +70,13 @@ PYTHON =	python2.7 ./
 PYTHON =	PYTHONPATH=${.OBJDIR} python2.7 ${.CURDIR}/
 .endif
 
+FRAG6_SCRIPTS !!=	cd ${.CURDIR} && ls -1 frag6*.py
+
+.for ps in pf stack
+
 # Ping all addresses.  This ensures that the ip addresses are configured
 # and all routing table are set up to allow bidirectional packet flow.
-run-regress-ping6:
+run-regress-${ps}-ping6:
 	@echo '\n======== $@ ========'
 .for ip in SRC_OUT DST_IN
 	@echo Check ping6 ${ip}6:
@@ -81,23 +85,23 @@ run-regress-ping6:
 
 # Ping all addresses again but with 5000 bytes payload.  These large
 # packets get fragmented by SRC and must be handled by DST.
-run-regress-fragping6:
+run-regress-${ps}-fragping6:
 	@echo '\n======== $@ ========'
 .for ip in SRC_OUT DST_IN
 	@echo Check ping6 ${ip}6:
 	ping6 -n -c 1 -s 5000 -m ${${ip}6}
 .endfor
 
-FRAG6_SCRIPTS !=	cd ${.CURDIR} && ls -1 frag6*.py
-
 .for s in ${FRAG6_SCRIPTS}
-run-regress-${s}: addr.py
+run-regress-${ps}-${s}: addr.py
 	@echo '\n======== $@ ========'
 	${SUDO} ${PYTHON}${s}
 .endfor
 
-REGRESS_TARGETS =	run-regress-ping6 run-regress-fragping6 \
-			${FRAG6_SCRIPTS:S/^/run-regress-/}
+REGRESS_TARGETS =	run-regress-${ps}-ping6 run-regress-${ps}-fragping6 \
+			${FRAG6_SCRIPTS:S/^/run-regress-${ps}-/}
+
+.endfor
 
 CLEANFILES +=		addr.py *.pyc *.log
 
