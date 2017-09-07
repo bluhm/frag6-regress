@@ -1,6 +1,6 @@
 #!/usr/local/bin/python2.7
 
-print "ping6 fragment that overlaps the first fragment completely"
+print "ping6 fragment head that overlaps the first fragment completely"
 
 # |---------|
 #      |XXXX|
