@@ -167,5 +167,7 @@ check-setup-remote:
 	ssh ${REMOTE_SSH} ping6 -n -c 1 ${LOCAL_ADDR6}  # LOCAL_ADDR6
 	ssh ${REMOTE_SSH} ndp -n ${LOCAL_ADDR6} |\
 	    grep -q ' ${LOCAL_MAC} '  # LOCAL_ADDR6 LOCAL_MAC
+	ssh ${REMOTE_SSH} route -n get -inet6 ${FAKE_NET_ADDR6} |\
+	    grep -q 'gateway: ${LOCAL_ADDR6}'  # FAKE_NET_ADDR6 LOCAL_ADDR6
 
 .include <bsd.regress.mk>
