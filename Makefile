@@ -90,7 +90,7 @@ stamp-pf: addr.py pf.conf
 	rm -f stamp-stack stamp-pf
 	cat addr.py ${.CURDIR}/pf.conf | pfctl -n -f -
 	cat addr.py ${.CURDIR}/pf.conf | \
-	    ssh ${IPS_SSH} ${SUDO} pfctl -a regress -f -
+	    ssh ${REMOTE_SSH} ${SUDO} pfctl -a regress -f -
 	-ssh ${REMOTE_SSH} ${SUDO} pfctl -e
 	date >$@
 
@@ -136,7 +136,7 @@ REGRESS_TARGETS +=	run-regress-${sp}-ping6 run-regress-${sp}-fragping6 \
 
 cleanup-pf:
 	rm -f stamp-stack stamp-pf
-	ssh ${IPS_SSH} ${SUDO} pfctl -a regress -Fa
+	ssh ${REMOTE_SSH} ${SUDO} pfctl -a regress -Fa
 	-ssh ${REMOTE_SSH} ${SUDO} pfctl -e || true
 
 REGRESS_TARGETS +=	cleanup-pf
