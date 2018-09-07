@@ -36,11 +36,11 @@ for f in frag:
 child = os.fork()
 if child == 0:
 	time.sleep(1)
-        randeth=eth
-        random.shuffle(randeth)
-        for e in randeth:
-                sendp(e, iface=LOCAL_IF)
-                time.sleep(0.001)
+	randeth=eth
+	random.shuffle(randeth)
+	for e in randeth:
+		sendp(e, iface=LOCAL_IF)
+		time.sleep(0.001)
 	os._exit(0)
 
 ans=sniff(iface=LOCAL_IF, timeout=10, filter=
