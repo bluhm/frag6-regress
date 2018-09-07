@@ -51,6 +51,7 @@ os.wait()
 for a in ans:
 	if a and a.type == ETH_P_IPV6 and \
 	    ipv6nh[a.payload.nh] == 'Fragment Header' and \
+	    a.payload.payload.offset == 0 and \
 	    ipv6nh[a.payload.payload.nh] == 'ICMPv6' and \
 	    icmp6types[a.payload.payload.payload.type] == 'Echo Reply':
 		id=a.payload.payload.payload.id
