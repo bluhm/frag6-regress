@@ -97,6 +97,11 @@ stamp-pf: addr.py pf.conf
 REGRESS_TARGETS =
 FRAG6_SCRIPTS !!=	cd ${.CURDIR} && ls -1 frag6*.py
 
+run-regress-stack-frag6_queuelimit.py:
+	@echo '\n======== $@ ========'
+	# the stack does not limit the amount of fragments during reassembly
+	@echo DISABLED
+
 .for sp in stack pf
 
 # Ping all addresses.  This ensures that the ip addresses are configured
